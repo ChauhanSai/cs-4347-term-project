@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browse Services</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="browse_services.html">Browse</a>
+        <a href="post_service.html">Post Service</a>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+    </nav>
+    <h1>Customer Portal: Browse & Manage</h1>
+
+    <section>
+        <h2>My Booking History</h2>
+        <!-- Placeholder for DB Query Results: Past & Current Bookings -->
+        <table border="1" cellpadding="5">
+            <thead>
+                <tr>
+                    <th>Service Booked</th>
+                    <th>Date/Time</th>
+                    <th>Provider</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="booking-history-body">
+                <tr><td colspan="5">Please log in to view your bookings.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Search for Services</h2>
+        <form id="search-form" action="#" method="GET">
+            <label for="keyword">Keyword:</label>
+            <input type="text" id="keyword" name="keyword" placeholder="e.g., Tutoring">
+            
+            <label for="categoryFilter">Category:</label>
+            <select id="categoryFilter" name="category">
+                <option value="">All Categories</option>
+                <!-- Dynamic categories loaded securely here -->
+            </select>
+            
+            <input type="submit" value="Search">
+        </form>
+    </section>
+
+    <section>
+        <h2>Available Services</h2>
+        <div id="services-container">
+            <p>Loading services...</p>
+        </div>
+    </section>
+    <script src="persist_user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load Categories dynamically globally onto filter
+            fetch('api_get_categories.php')
+                .then(r => r.json())
+                .then(data => {
+                    const dropdown = document.getElementById('categoryFilter');
+                    if (!data.error && Array.isArray(data)) {
+                        data.forEach(cat => {
+                            const option = document.createElement('option');
+                            option.value = cat.category_id;
+                            option.textContent = cat.category_name;
+                            dropdown.appendChild(option);
+                        });
+                    }
+                });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('user_id');
+            const tbody = document.getElementById('booking-history-body');
+            
+            if (userId) {
+                fetch(`api_get_bookings.php?user_id=${userId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.error) {
+                            tbody.innerHTML = `<tr><td colspan="5" style="color: red;">Error: ${data.error}</td></tr>`;
+                            return;
+                        }
+                        
+                        if (data.length === 0) {
+                            tbody.innerHTML = `<tr><td colspan="5">No bookings found.</td></tr>`;
+                            return;
+                        }
+                        
+                        tbody.innerHTML = '';
+                        data.forEach(b => {
+                            let actionHtml = '';
+                            if (!b.payment_id) {
+                                actionHtml = `<a href="payment.html?booking_id=${b.booking_id}">Pay Now</a>`;
+                            } else if (!b.review_id) {
+                                actionHtml = `<a href="leave_review.html?booking_id=${b.booking_id}">Leave a Review</a>`;
+                            }
+                            
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${b.service_title}</td>
+                                    <td>${b.scheduled_time || 'Pending'}</td>
+                                    <td>${b.provider_name}</td>
+                                    <td style="text-transform: capitalize;">${b.status}</td>
+                                    <td>${actionHtml}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        // Fire a small custom event so persist_user.js can catch any new links if needed
+                        // Wait, persist_user.js only does querySelectorAll('a') on DOMContentLoaded.
+                        // We will manually append user_id to these links now.
+                        tbody.querySelectorAll('a').forEach(a => {
+                            const linkUrl = new URL(a.href, window.location.origin);
+                            linkUrl.searchParams.set('user_id', userId);
+                            a.href = linkUrl.toString();
+                        });
+                    })
+                    .catch(e => {
+                        tbody.innerHTML = `<tr><td colspan="5" style="color: red;">Failed to load bookings.</td></tr>`;
+                    });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="5">Please log in to view your bookings.</td></tr>`;
+            }
+
+            // Function to load Available Services
+            function loadServices(keyword = '', category = '') {
+                const servicesContainer = document.getElementById('services-container');
+                servicesContainer.innerHTML = '<p>Loading services...</p>';
+                
+                fetch(`api_get_services.php?keyword=${encodeURIComponent(keyword)}&category=${encodeURIComponent(category)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.error) {
+                            servicesContainer.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                            return;
+                        }
+                        if (data.length === 0) {
+                            servicesContainer.innerHTML = `<p>No services found matching your criteria.</p>`;
+                            return;
+                        }
+                        
+                        let html = '';
+                        // In reality, if price is flat, you might drop /hr, but formatting the DB price works fine here
+                        data.forEach(s => {
+                            html += `
+                            <div class="service-card">
+                                <h3>${s.title}</h3>
+                                <p><strong>Provider:</strong> ${s.provider_name}</p>
+                                <p><strong>Category:</strong> ${s.category_name}</p>
+                                <p><strong>Description:</strong> ${s.description || 'No description provided.'}</p>
+                                <p><strong>Price:</strong> $${parseFloat(s.price).toFixed(2)}</p>
+                                <p><strong>Availability:</strong> ${s.availability || 'N/A'}</p>
+                                <a href="book_service.html?service_id=${s.listing_id}">Book this Service</a>
+                            </div>`;
+                        });
+                        servicesContainer.innerHTML = html;
+                        
+                        if (userId) {
+                            servicesContainer.querySelectorAll('a').forEach(a => {
+                                const linkUrl = new URL(a.href, window.location.origin);
+                                linkUrl.searchParams.set('user_id', userId);
+                                a.href = linkUrl.toString();
+                            });
+                        }
+                    })
+                    .catch(e => {
+                        servicesContainer.innerHTML = `<p style="color: red;">Failed to load services.</p>`;
+                    });
+            }
+
+            // Initial load of all services
+            loadServices();
+
+            // Hook up search form
+            document.getElementById('search-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const keyword = document.getElementById('keyword').value;
+                const category = document.getElementById('categoryFilter').value;
+                loadServices(keyword, category);
+            });
+        });
+    </script>
+</body>
+</html>

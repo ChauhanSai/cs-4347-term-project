@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post a Service & Manage Listings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="browse_services.html">Browse</a>
+        <a href="post_service.html">Post Service</a>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+    </nav>
+    <h1>Service Provider Dashboard</h1>
+
+
+    <section>
+        <h2>Manage My Listings</h2>
+        <!-- Placeholder for DB Query Results: Existing Listings -->
+        <table border="1" cellpadding="5">
+            <thead>
+                <tr>
+                    <th>Service Title</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="manage-listings-body">
+                <tr><td colspan="4">Please log in to view your listings.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Post a New Service</h2>
+        <form action="post_service_action.php" method="POST">
+            <label for="title">Service Title:</label><br>
+            <input type="text" id="title" name="title" required><br><br>
+            
+            <label for="category">Category:</label><br>
+            <select id="category" name="category" required>
+                <!-- Dynamic DB categories loaded here -->
+            </select><br><br>
+            
+            <!--<label for="description">Description:</label><br>
+            <textarea id="description" name="description" rows="5" cols="40" required></textarea><br><br>-->
+            
+            <label for="price">Price ($):</label><br>
+            <input type="number" id="price" name="price" step="0.01" required><br><br>
+            
+            <label for="availability">Availability (e.g., Weekends, Evenings):</label><br>
+            <input type="text" id="availability" name="availability" required><br><br>
+            
+            <input type="submit" value="Post Service">
+        </form>
+    </section>
+    <script src="persist_user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load Categories dynamically directly from DB model bindings
+            fetch('api_get_categories.php')
+                .then(r => r.json())
+                .then(data => {
+                    const dropdown = document.getElementById('category');
+                    if (!data.error && Array.isArray(data)) {
+                        data.forEach(cat => {
+                            const option = document.createElement('option');
+                            option.value = cat.category_id;
+                            option.textContent = cat.category_name;
+                            dropdown.appendChild(option);
+                        });
+                    }
+                });
+
+
+            const userId = urlParams.get('user_id');
+            const tbody = document.getElementById('manage-listings-body');
+            
+            if (userId) {
+                fetch(`api_get_my_listings.php?user_id=${userId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.error) {
+                            tbody.innerHTML = `<tr><td colspan="4" style="color: red;">Error: ${data.error}</td></tr>`;
+                            return;
+                        }
+                        
+                        if (data.length === 0) {
+                            tbody.innerHTML = `<tr><td colspan="4">No listings found. Post a service below!</td></tr>`;
+                            return;
+                        }
+                        
+                        tbody.innerHTML = '';
+                        // Render fetched provider data row by row
+                        data.forEach(s => {
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${s.title}</td>
+                                    <td>${s.category_name}</td>
+                                    <td>$${parseFloat(s.price).toFixed(2)}</td>
+                                    <td>
+                                        <a href="delete_service.php?id=${s.listing_id}&user_id=${userId}">Delete</a>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        
+                        // Append persistent user_id to inner links
+                        tbody.querySelectorAll('a').forEach(a => {
+                            const linkUrl = new URL(a.href, window.location.origin);
+                            linkUrl.searchParams.set('user_id', userId);
+                            a.href = linkUrl.toString();
+                        });
+                    })
+                    .catch(e => {
+                        tbody.innerHTML = `<tr><td colspan="4" style="color: red;">Failed to load listings.</td></tr>`;
+                    });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="4">Please log in to view your listings.</td></tr>`;
+            }
+        });
+    </script>
+</body>
+</html>

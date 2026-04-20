@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leave a Review</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="browse_services.html">Browse</a>
+        <a href="post_service.html">Post Service</a>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+    </nav>
+    <h1>Leave Feedback & Rating</h1>
+
+    <section>
+        <h2>Booking Details</h2>
+        <div id="booking-details-container">
+            <p>Loading booking details...</p>
+        </div>
+    </section>
+
+    <form action="submit_review_action.php" method="POST">
+        <input type="hidden" id="booking_id_input" name="booking_id" value="">
+        
+        <label for="rating">Rating (1 to 5 stars):</label><br>
+        <select id="rating" name="rating" required>
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Good</option>
+            <option value="3">3 - Average</option>
+            <option value="2">2 - Poor</option>
+            <option value="1">1 - Terrible</option>
+        </select><br><br>
+        
+        <label for="comments">Review Comments:</label><br>
+        <textarea id="comments" name="comments" rows="5" cols="40" placeholder="Describe your experience with this service..."></textarea><br><br>
+        
+        <input type="submit" value="Submit Review">
+    </form>
+    <script src="persist_user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('booking_id');
+            const container = document.getElementById('booking-details-container');
+            
+            if (bookingId) {
+                // Ensure the form POST securely captures this booking context
+                document.getElementById('booking_id_input').value = bookingId;
+                
+                fetch(`api_get_review_details.php?booking_id=${bookingId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.error) {
+                            container.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                            return;
+                        }
+                        
+                        // Dynamically render actual underlying Booking metadata
+                        container.innerHTML = `
+                            <p><strong>Service:</strong> ${data.title}</p>
+                            <p><strong>Provider:</strong> ${data.provider_name}</p>
+                            <p><strong>Date Completed:</strong> ${data.completed_date || 'N/A'}</p>
+                        `;
+                    })
+                    .catch(e => {
+                        container.innerHTML = `<p style="color: red;">Failed to load booking details.</p>`;
+                    });
+            } else {
+                container.innerHTML = `<p style="color: red;">No booking specified in URL.</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

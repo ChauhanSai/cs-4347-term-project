@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book a Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="browse_services.html">Browse</a>
+        <a href="post_service.html">Post Service</a>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+    </nav>
+    <h1>Book Service</h1>
+
+
+    <section>
+        <h2>Service Details</h2>
+        <!-- Placeholder for DB Query Results: Details of the selected service -->
+        <p><strong>Service:</strong> <span id="serviceTitlePlaceholder">Introduction to Python Tutoring</span></p>
+        <p><strong>Provider:</strong> <span id="providerNamePlaceholder">Alex Johnson</span></p>
+        <p><strong>Price:</strong> <span id="pricePlaceholder">$25/hr</span></p>
+    </section>
+
+    <section>
+        <h2>Booking Form</h2>
+        <form action="booking_action.php" method="POST">
+            <!-- Hidden input to pass IDs from URL param -->
+            <input type="hidden" id="hidden_service_id" name="service_id" value="">
+            <input type="hidden" id="hidden_user_id" name="user_id" value="">
+            
+            <label for="bookingDate">Preferred Date:</label><br>
+            <input type="date" id="bookingDate" name="bookingDate" required><br><br>
+            
+            <label for="bookingTime">Preferred Time:</label><br>
+            <input type="time" id="bookingTime" name="bookingTime" required><br><br>
+            
+            <!-- <label for="notes">Additional Requirements/Notes:</label><br>
+            <textarea id="notes" name="notes" rows="4" cols="40"></textarea><br><br> -->
+            
+            <input type="submit" value="Confirm Booking">
+        </form>
+    </section>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+
+
+        const serviceId = urlParams.get('service_id');
+        const userId = urlParams.get('user_id');
+
+        // 2. Inject them into the hidden form fields
+        if (serviceId) {
+            document.getElementById('hidden_service_id').value = serviceId;
+        }
+        if (userId) {
+            document.getElementById('hidden_user_id').value = userId;
+        }
+    </script>
+    <script src="persist_user.js"></script>
+</body>
+</html>

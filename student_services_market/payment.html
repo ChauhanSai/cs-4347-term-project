@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Confirmation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="browse_services.html">Browse</a>
+        <a href="post_service.html">Post Service</a>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+    </nav>
+    <h1>Payment Gateway</h1>
+    <section>
+        <h2>Booking Invoice</h2>
+        <!-- Placeholder for DB Query Results: Invoice details -->
+        <div id="invoice-container">
+            <p>Loading invoice details...</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Payment Details</h2>
+        <form action="process_payment_action.php" method="POST">
+            <input type="hidden" id="booking_id_input" name="booking_id" value="">
+            <input type="hidden" id="amount_input" name="amount" value="">
+
+            <label for="cardName">Name on Card:</label><br>
+            <input type="text" id="cardName" name="cardName" required><br><br>
+            
+            <label for="cardNumber">Card Number:</label><br>
+            <input type="text" id="cardNumber" name="cardNumber" placeholder="1234-5678-9012-3456" required><br><br>
+            
+            <label for="expiry">Expiry Date:</label><br>
+            <input type="month" id="expiry" name="expiry" required><br><br>
+            
+            <label for="cvv">CVV:</label><br>
+            <input type="text" id="cvv" name="cvv" maxlength="3" required><br><br>
+            
+            <input type="submit" value="Complete Payment">
+        </form>
+    </section>
+    <script src="persist_user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('booking_id');
+            const invoiceContainer = document.getElementById('invoice-container');
+            
+            if (bookingId) {
+                fetch(`api_get_invoice.php?booking_id=${bookingId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.error) {
+                            invoiceContainer.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                            return;
+                        }
+                        
+                        const priceFormatted = parseFloat(data.price).toFixed(2);
+                        
+                        invoiceContainer.innerHTML = `
+                            <p><strong>Booking Ref:</strong> #${data.booking_id}</p>
+                            <p><strong>Service:</strong> ${data.title}</p>
+                            <p><strong>Amount Due:</strong> <span style="font-weight: bold; color: green;">$${priceFormatted}</span></p>
+                        `;
+                        
+                        document.getElementById('booking_id_input').value = data.booking_id;
+                        document.getElementById('amount_input').value = data.price;
+                    })
+                    .catch(e => {
+                        invoiceContainer.innerHTML = `<p style="color: red;">Failed to load invoice.</p>`;
+                    });
+            } else {
+                invoiceContainer.innerHTML = `<p style="color: red;">No booking specified in URL.</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

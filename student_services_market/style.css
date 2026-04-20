@@ -1,0 +1,281 @@
+/* UTD Colors */
+:root {
+    --utd-green: #154734;
+    --utd-green-dark: #0d2c20;
+    --utd-orange: #E87500;
+    --utd-orange-dark: #b85d00;
+    --bg-color: #f7f9fa;
+    --text-color: #3c3c3c;
+    --card-bg: #ffffff;
+    --border-color: #e5e5e5;
+}
+
+body {
+    font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Navigation Bar */
+nav {
+    background-color: var(--utd-green);
+    padding: 1rem 2rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    box-shadow: 0 4px 0 var(--utd-green-dark);
+    margin-bottom: 2rem;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+h1,
+h2,
+h3 {
+    text-align: center;
+    color: var(--utd-green);
+}
+
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Containers and Sections */
+section,
+form,
+.container {
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 6px 0 var(--border-color);
+}
+
+hr {
+    border: none;
+    height: 2px;
+    background-color: var(--border-color);
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+/* Inputs and Forms */
+label {
+    font-weight: 700;
+    color: var(--text-color);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+input[type="radio"]+label,
+input[type="checkbox"]+label {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: inherit;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    display: inline-block;
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="month"],
+input[type="tel"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 14px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: var(--bg-color);
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--utd-orange);
+    background-color: #fff;
+}
+
+/* Buttons (Duolingo Style) */
+input[type="submit"],
+button,
+.btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: var(--utd-orange);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--utd-orange-dark);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.1s ease;
+    text-decoration: none;
+    box-sizing: border-box;
+    margin-top: 1rem;
+}
+
+input[type="submit"]:active,
+button:active,
+.btn:active {
+    transform: translateY(5px);
+    box-shadow: 0 0 0 var(--utd-orange-dark);
+}
+
+/* Cards (Services, History) */
+.service-card {
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 0 var(--border-color);
+    background-color: #fff;
+}
+
+.service-card h3 {
+    margin-top: 0;
+    color: var(--utd-green);
+    text-align: left;
+}
+
+.service-card p {
+    margin: 0.5rem 0;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--border-color);
+}
+
+th {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-weight: 800;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Links */
+a {
+    color: var(--utd-orange);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+p {
+    text-align: center;
+}
+
+fieldset {
+    border: 2px solid var(--border-color);
+    border-radius: 14px;
+    margin-bottom: 1.5rem;
+}
+
+legend {
+    font-weight: bold;
+    color: var(--utd-green);
+}
+
+/* Error Messages */
+.error-message {
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    padding: 1rem 2rem;
+    background-color: #ff4b4b;
+    color: white;
+    border: 2px solid #ea2b2b;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 4px 0 #ea2b2b;
+}
+
+/* Auth Messages */
+.auth-message {
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    padding: 1rem 2rem;
+    background-color: #f9df4c;
+    color: white;
+    border: 2px solid #eac12b;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 4px 0 #eac12b;
+}
+
+/* MSG Messages */
+.msg-message {
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    padding: 1rem 2rem;
+    background-color: #7fd277;
+    color: white;
+    border: 2px solid #49a045;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 4px 0 #49a045;
+}
